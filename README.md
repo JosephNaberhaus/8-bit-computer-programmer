@@ -2,7 +2,11 @@
 
 This repo contains the code I use to program my breadboard 8-bit computer. It's composed of two parts. First, the [assembler](./assembler/) is a Golang application for translating assembly into machine code. The generated machine code is embedded within [program.h](./components/program/program.h). This header file is part of the second compononent, a C program that can be flashed onto an ESP32 microcontroller. I can then use this ESP32 to program my breadboard computer.
 
+## Requirments
 
+- Any reasonably modern version of Golang
+- [idf.py](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
+- [just](https://github.com/casey/just)
 
 ## Instruction Set
 
