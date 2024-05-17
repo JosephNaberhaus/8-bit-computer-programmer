@@ -2,3 +2,5 @@
 
 build
 sdkconfig
+
+components/program/assembled.txt
