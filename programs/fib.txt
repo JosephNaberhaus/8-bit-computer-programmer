@@ -1,0 +1,11 @@
+start:
+MV $i $1 1
+MV $i $2 1
+loop:
+ADD $1 $2 $3
+// If the result is less than the previous value then we overflowed. Restart.
+LT $3 $2 $4
+JMPNZ $4 $i start
+MV $2 $1
+MV $3 $2
+JMP $i loop
