@@ -1,4 +1,4 @@
-# 8 Bit Computer Programmer
+# 8-Bit Computer Programmer
 
 This repo contains the code I use to program my breadboard 8-bit computer. It's composed of two parts. First, the [assembler](./assembler/) is a Golang application for translating assembly into machine code. The generated machine code is embedded within [program.h](./components/program/program.h). This header file is part of the second compononent, a C program that can be flashed onto an ESP32 microcontroller. I can then use this ESP32 to program my breadboard computer.
 

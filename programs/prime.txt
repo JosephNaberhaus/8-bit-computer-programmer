@@ -57,9 +57,4 @@ JMP $i check_divisable_loop
 is_prime:
 LOAD $i $4 0
 
-// TEMP
-temp:
-EQ $i $4 $1 +113
-JMPNZ $1 $i temp
-
 JMP $i next_number
