@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unsafe"
 )
 
 var inputPath = flag.String("input", "", "input assembly file")
@@ -82,13 +83,18 @@ const register4 = "$4"
 const immediate = "$i"
 
 func preProcess(lines []string) []string {
-	labelMatcher := regexp.MustCompile(`^\s*([a-zA-Z]+):\s*$`)
+	labelMatcher := regexp.MustCompile(`^\s*([a-zA-Z_]+):\s*$`)
 
 	labelToLine := map[string]int{}
 
 	var result []string
 	for len(lines) > 0 {
 		curLine := lines[0]
+		lines = lines[1:]
+
+		if strings.TrimSpace(curLine) == "" {
+			continue
+		}
 
 		match := labelMatcher.FindStringSubmatch(curLine)
 		if len(match) == 2 {
@@ -96,8 +102,6 @@ func preProcess(lines []string) []string {
 		} else if !strings.HasPrefix(curLine, "//") {
 			result = append(result, curLine)
 		}
-
-		lines = lines[1:]
 	}
 
 	for i := range result {
@@ -157,6 +161,33 @@ func assembleLine(line string) ([]byte, error) {
 	}
 }
 
+func parseImmediate(part string) (byte, error) {
+	isSigned := false
+	if part[0] == '-' || part[0] == '+' {
+		isSigned = true
+		part = part[1:]
+	}
+
+	var value byte
+	if isSigned {
+		parsedValue, err := strconv.ParseInt(part, 10, 8)
+		if err != nil {
+			return 0, err
+		}
+
+		value = *(*byte)(unsafe.Pointer(&parsedValue))
+	} else {
+		parsedValue, err := strconv.ParseUint(part, 10, 8)
+		if err != nil {
+			return 0, err
+		}
+
+		value = byte(parsedValue)
+	}
+
+	return value, nil
+}
+
 func assembleUnaryIO(parts []string) (byte, byte, error) {
 	if len(parts) < 2 || len(parts) > 3 {
 		return 0, 0, errors.New("unexpected number of parts")
@@ -196,12 +227,12 @@ func assembleUnaryIO(parts []string) (byte, byte, error) {
 
 	var immediateValue byte
 	if len(parts) == 3 {
-		value, err := strconv.ParseUint(parts[2], 10, 8)
+		value, err := parseImmediate(parts[2])
 		if err != nil {
 			return 0, 0, err
 		}
 
-		immediateValue = byte(value)
+		immediateValue = value
 	}
 
 	return control, immediateValue, nil
@@ -232,12 +263,12 @@ func assembleUnaryI(parts []string) (byte, byte, error) {
 
 	var immediateValue byte
 	if len(parts) == 2 {
-		value, err := strconv.ParseUint(parts[1], 10, 8)
+		value, err := parseImmediate(parts[1])
 		if err != nil {
 			return 0, 0, err
 		}
 
-		immediateValue = byte(value)
+		immediateValue = value
 	}
 
 	return control, immediateValue, nil
@@ -298,12 +329,12 @@ func assembleBinaryIO(parts []string) (byte, byte, error) {
 
 	var immediateValue byte
 	if len(parts) == 4 {
-		value, err := strconv.ParseUint(parts[3], 10, 8)
+		value, err := parseImmediate(parts[3])
 		if err != nil {
 			return 0, 0, err
 		}
 
-		immediateValue = byte(value)
+		immediateValue = value
 	}
 
 	return control, immediateValue, nil
@@ -350,12 +381,12 @@ func assembleBinaryI(parts []string) (byte, byte, error) {
 
 	var immediateValue byte
 	if len(parts) == 3 {
-		value, err := strconv.ParseUint(parts[2], 10, 8)
+		value, err := parseImmediate(parts[2])
 		if err != nil {
 			return 0, 0, err
 		}
 
-		immediateValue = byte(value)
+		immediateValue = value
 	}
 
 	return control, immediateValue, nil
@@ -475,7 +506,7 @@ func assembleLoad(parts []string) ([]byte, error) {
 		return nil, err
 	}
 
-	return []byte{0b10010010, control, immediate}, nil
+	return []byte{0b10000000, control, immediate}, nil
 }
 
 func assembleShiftLeft(parts []string) ([]byte, error) {
@@ -515,10 +546,10 @@ func assembleJumpIFNotZero(parts []string) ([]byte, error) {
 }
 
 func assembleStore(parts []string) ([]byte, error) {
-	control, immediate, err := assembleBinaryIO(parts)
+	control, immediate, err := assembleBinaryI(parts)
 	if err != nil {
 		return nil, err
 	}
 
-	return []byte{0b00000000, control, immediate}, nil
+	return []byte{0b00010000, control, immediate}, nil
 }

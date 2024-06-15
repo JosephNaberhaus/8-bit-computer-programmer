@@ -1,0 +1,65 @@
+// Register 1: Temp
+// Register 2: A copy of the current number which is being divided
+// Register 3: The number we're dividing by
+// Register 4: The last discovered prime number
+
+// Memory 0: The current number being tested
+
+// Start with 2
+MV $i $1 +2
+STORE $i $1 0
+
+prime_loop:
+
+// Start dividing by 2
+MV $i $3 +2
+
+check_divisable_loop:
+LOAD $i $2 0
+
+// If our divisor has reached our dividend then this is a prime number
+EQ $2 $3 $1
+JMPNZ $1 $i is_prime
+
+subtract_loop:
+SUB $2 $3 $2
+
+// The number is zero than the dvision
+// resulted in no remainder.
+EQ $2 $i $1 0
+JMPNZ $1 $i is_divisable
+
+// If the number is less than zero then
+// the division resulted in a remainder.
+SLT $2 $i $1 0
+JMPNZ $1 $i not_divisable
+
+// Otherwise, we're not done dividing yet.
+JMP $i subtract_loop
+
+// The number was evently divided.
+// Try the next number
+is_divisable:
+// Also re-use this code if we simply
+// want the next number.
+next_number:
+LOAD $i $1 0
+ADD $1 $i $1 1
+STORE $i $1 0
+
+JMP $i prime_loop
+
+// The number wasn't evenly divided.
+not_divisable:
+ADD $3 $i $3 1
+JMP $i check_divisable_loop
+
+is_prime:
+LOAD $i $4 0
+
+// TEMP
+temp:
+EQ $i $4 $1 +113
+JMPNZ $1 $i temp
+
+JMP $i next_number

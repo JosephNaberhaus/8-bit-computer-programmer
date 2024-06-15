@@ -14,7 +14,9 @@ The instruction set is my own invention. The following is a brief overview of it
 
 ### Register Selection
 
-Each instruction takes ones or more register selection arguments. Each one will correspond to one of the four registers availible. The notation is the `$` symbol followed by the number 1-4 for the register number (e.g. `$1`, `$2`, `$3`, or `$4`). Inputs to an instruction can also choose to use an immediate value instead of a register. This is notated by the `$i` symbol. If an instruction uses an immediate value the **final** argument must be a number between 0 and 255. For signed numbers, you will need to manually convert the bit pattern of a 2s complement number into an unsigned number.
+Each instruction takes ones or more register selection arguments. Each one will correspond to one of the four registers availible. The notation is the `$` symbol followed by the number 1-4 for the register number (e.g. `$1`, `$2`, `$3`, or `$4`).
+
+Inputs to an instruction can also choose to use an immediate value instead of a register. This is notated by the `$i` symbol. If an instruction uses an immediate value the **final** argument must be a number. For unsigned number, this can be any number in the range [0, 255]. For signed numbers, this can be any number in the range [-128, 127]. Signed numbers are distguished by placing a `+` or `-` symbol in front of them (optional for positive numbers, but doing so will make the assembler ensure your number is in the valid range).
 
 ### Comments
 

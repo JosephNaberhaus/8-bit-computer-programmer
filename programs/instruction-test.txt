@@ -1,3 +1,8 @@
-start:
+MV $i $1 255
+MV $i $2 0
+loop:
+STORE $2 $1
 MV $i $1 0
-JMPNZ $1 $i start
+LOAD $2 $1
+ADD $2 $i $2 1
+JMP $i loop
