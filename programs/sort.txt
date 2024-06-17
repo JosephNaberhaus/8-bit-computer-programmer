@@ -1,0 +1,96 @@
+// Register 2 keeps track of how many numbers we have
+MV $i $2 0
+
+// Load some numbers into memory
+MV $i $1 10
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 4
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 100
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 23
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 1
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 42
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 45
+STORE $2 $1
+ADD $i $2 $2 1
+MV $i $1 245
+STORE $2 $1
+ADD $i $2 $2 1
+
+// Store register 2 in memory so that we can recall it
+STORE $i $2 254
+
+// Memory 255 holds the current index
+MV $i $3 0
+STORE $i $3 255
+
+sort_loop:
+
+// Register 3 holds the index of the smallest number so far
+// Register 4 holds the index of the current number
+LOAD $i $3 255
+MV $3 $4
+
+find_smallest_loop:
+
+LOAD $3 $1
+LOAD $4 $2
+
+LT $1 $2 $1
+JMPNZ $1 $i not_smaller
+
+// The new number is smaller.
+MV $4 $3
+
+not_smaller:
+
+ADD $i $4 $4 1
+
+// Check if we're done
+LOAD $i $2 254
+EQ $4 $2 $1
+JMPNZ $1 $i done_find_smallest
+
+JMP $i find_smallest_loop
+
+done_find_smallest:
+
+// Swap the numbers in memory
+LOAD $3 $1
+LOAD $i $4 255
+LOAD $4 $2
+STORE $3 $2
+STORE $4 $1
+
+ADD $i $4 $4 1
+STORE $i $4 255
+
+// Check if we're done sorting
+LOAD $i $2 254
+EQ $2 $4 $1
+JMPNZ $1 $i done_sorting
+JMP $i sort_loop
+
+done_sorting:
+LOAD $i $2 254
+
+start_display:
+MV $i $1 0
+
+display_loop:
+LOAD $1 $4
+
+ADD $i $1 $1 1
+EQ $1 $2 $3
+JMPNZ $3 $i start_display
+JMP $i display_loop
